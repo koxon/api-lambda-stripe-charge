@@ -1,5 +1,6 @@
-
 # API Gateway -> Lambda -> Stripe Charge Payment (Checkout)
+
+NFT Freezer uses this fork to process webhooks from Stripe
 
 ## Description
 
@@ -16,7 +17,7 @@ aws ssm put-parameter --name /lambda-stripe-charge/stripe-secret-key --value YOU
 ```
 
 4. Want to use Stripe's Checkout ? - [https://stripe.com/docs/checkout](https://stripe.com/docs/checkout)
- (most likely others are supported too, but can't guarantee, need to check)
+   (most likely others are supported too, but can't guarantee, need to check)
 5. Set your frontend part as specified in the [https://stripe.com/docs/checkout#integration](https://stripe.com/docs/checkout#integration)
 6. Extend your form with hidden input HTML elements for **amount** and **currency**. Those fields you will need to populate with the values chosen by the user. If not familiar with that approach I recommend this StackOverflow post - [https://stackoverflow.com/questions/37798593/stripe-checkout-how-to-pass-a-value-through-to-webhook](https://stackoverflow.com/questions/37798593/stripe-checkout-how-to-pass-a-value-through-to-webhook)
 
