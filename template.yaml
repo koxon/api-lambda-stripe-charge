@@ -26,6 +26,9 @@ Parameters:
     AllowedValues: [true, false]
     Default: true
     Description: To immediatelly capture a payment upon charge, if true it means on charge you collect the amount, if false, you need to do a capture.
+  Environment:
+    Default: dev
+    Type: String
 Conditions:
   ShouldEnableCapture: !Equals [true, !Ref EnableInstantCapture]
 Resources:
@@ -38,7 +41,7 @@ Resources:
         MaxAge: "'3600'"
         AllowMethods: "'OPTIONS,POST'"
       EndpointConfiguration: REGIONAL
-      StageName: prod
+      StageName: !Ref Environment
       TracingEnabled: true
   CreateStripeCharge:
     Type: AWS::Serverless::Function
