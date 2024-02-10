@@ -4,3 +4,5 @@ npm_debug.log
 .DS_Store
 .idea
 output.yaml
+.aws-sam
+
