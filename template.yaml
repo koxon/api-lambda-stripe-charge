@@ -3,9 +3,11 @@ Transform: AWS::Serverless-2016-10-31
 
 Globals:
   Function:
-    Runtime: nodejs14.x
+    Runtime: nodejs20.x
     Timeout: 10
     Tracing: Active
+    Architectures:
+      - arm64
 
 Parameters:
   CorsOrigin:
@@ -43,6 +45,7 @@ Resources:
       EndpointConfiguration: REGIONAL
       StageName: !Ref Environment
       TracingEnabled: true
+      Description: Webhooks for Stripe callbacks on checkout
   CreateStripeCharge:
     Type: AWS::Serverless::Function
     Properties:
@@ -114,13 +117,13 @@ Resources:
     Type: AWS::SNS::Topic
 Outputs:
   ChargeApiUrl:
-    Value: !Sub https://${ChargeStripeApiWebhook}.execute-api.${AWS::Region}.amazonaws.com/prod/charge
+    Value: !Sub https://${ChargeStripeApiWebhook}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/charge
     Description: The URL of the API Gateway you provide to Stripe as a webhook it invokes to CREATE a charge based on its token.
   CaptureApiUrl:
-    Value: !Sub https://${ChargeStripeApiWebhook}.execute-api.${AWS::Region}.amazonaws.com/prod/capture
+    Value: !Sub https://${ChargeStripeApiWebhook}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/capture
     Description: The URL of the API Gateway you provide to Stripe as a webhook it invokes to CAPTURE a charge based on its token.
   RefundApiUrl:
-    Value: !Sub https://${ChargeStripeApiWebhook}.execute-api.${AWS::Region}.amazonaws.com/prod/refund
+    Value: !Sub https://${ChargeStripeApiWebhook}.execute-api.${AWS::Region}.amazonaws.com/${Environment}/refund
     Description: The URL of the API Gateway you provide to Stripe as a webhook it invokes to CAPTURE a charge based on its token.
   SNSTopic:
     Value: !Ref SNSTopic
