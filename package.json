@@ -2,7 +2,8 @@
   "name": "api-lambda-stripe-charge",
   "version": "4.4.2",
   "description": "",
-  "main": "charge.js",
+  "main": "stripe.js",
+  "type": "module",
   "scripts": {
     "test": "jest --color",
     "prepack": "npm install --production",

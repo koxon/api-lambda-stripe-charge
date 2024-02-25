@@ -1,0 +1,10 @@
+{
+    "Parameters": {
+      "IS_CORS": "IsCorsDefined",
+      "CORS_ORIGIN": "'*'",
+      "SSM_STRIPE_SECRET_KEY": "lambda-stripe-charge/stripe-secret-key",
+      "SSM_STRIPE_ENDPOINT_SECRET": "lambda-stripe-charge/stripe-endpoint-secret",
+      "TOPIC_ARN": "arn:aws:sns:us-east-1:762318930553:StripeWebhooksDev-SNSTopic-nVPKMdfpBnrJ"
+    }
+}
+

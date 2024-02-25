@@ -3,40 +3,51 @@ const AWS = require('aws-sdk'),
   processResponse = require('./src/process-response'),
   // processSubscription = require('./src/process-subscription'),
   STRIPE_SECRET_KEY_NAME = `/${process.env.SSM_STRIPE_SECRET_KEY}`,
-  STRIPE_ENDPOINT_SECRET_NAME = `/${process.env.STRIPE_ENDPOINT_SECRET_NAME}`,
-  IS_CORS = true,
-  stripeSecretKeyValue = ssm.getParameter({ Name: STRIPE_SECRET_KEY_NAME, WithDecryption: true }),
-  stripeEndpointSecret = ssm.getParameter({ Name: STRIPE_ENDPOINT_SECRET_NAME, WithDecryption: true }),
-  stripe = require('stripe')(stripeSecretKeyValue);
+  STRIPE_ENDPOINT_SECRET_NAME = `/${process.env.SSM_STRIPE_ENDPOINT_SECRET}`,
+  IS_CORS = true;
+
+let data = await ssm.getParameter({ Name: STRIPE_SECRET_KEY_NAME, WithDecryption: true }).promise();
+console.log(data);
+let stripeSecretKeyValue = data.Parameter.Value;
+
+data = await ssm.getParameter({ Name: STRIPE_ENDPOINT_SECRET_NAME, WithDecryption: true }).promise();
+console.log(data);
+let stripeEndpointSecret = data.Parameter.Value;
+
+let stripe = require('stripe')(stripeSecretKeyValue);
 
 exports.handler = (event) => {
   console.log(event);
 
   if (!event.body) {
-    return Promise.resolve(processResponse(IS_CORS, 'invalid', 400));
+    return Promise.resolve(processResponse(IS_CORS, 'Body invalid', 400));
+  }
+
+  if (!event.headers['Stripe-Signature']) {
+    return Promise.resolve(processResponse(IS_CORS, 'No stripe signature', 400));
   }
 
   // Verify the signature sent by Stripe
   let stripeEvent;
   try {
-    stripeEvent = stripe.webhooks.constructEvent(event.body, request.headers['stripe-signature'], stripeEndpointSecret.Parameter.value);
+    stripeEvent = stripe.webhooks.constructEvent(event.body, event.headers['Stripe-Signature'], stripeEndpointSecret);
   } catch (err) {
-    console.err(`⚠️  Webhook signature verification failed.`, err.message);
-    return response.sendStatus(400);
+    console.error(`⚠️  Webhook signature verification failed.`, err.message);
+    return Promise.resolve(processResponse(IS_CORS, `Webhook signature verification failed.`, 400));
   }
 
   console.log(`StripeEvent type: ${stripeEvent.type}`);
 
   // Process events
   switch (stripeEvent.type) {
-    case 'subscription.created':
+    case 'payment_intent.succeeded':
       return Promise.resolve(processResponse(IS_CORS, `OK`, 200));
-    case 'customer.created':
+    case 'customer.updated':
       return Promise.resolve(processResponse(IS_CORS, `OK`, 200));
     case 'charge.succeeded':
       return Promise.resolve(processResponse(IS_CORS, `OK`, 200));
     default:
-      console.err(`Unsupported Stripe event: ${stripeEvent.type}`);
+      console.error(`Unsupported Stripe event: ${stripeEvent.type}`);
       return Promise.resolve(processResponse(IS_CORS, `Unsupported event ${stripeEvent.type}`, 400));
   }
 };
