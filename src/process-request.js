@@ -3,7 +3,6 @@ export function processRequest(stripeEvent) {
   switch (stripeEvent.type) {
     case 'payment_intent.succeeded':
       console.log(`OK payment_intent.succeeded`);
-      processRequest(stripeEvent);
       return 'OK';
     case 'customer.updated':
       console.log(`OK customer.updated`);
