@@ -1,31 +1,37 @@
-const AWS = require('aws-sdk'),
-  ssm = new AWS.SSM(),
-  processResponse = require('./src/process-response'),
-  // processSubscription = require('./src/process-subscription'),
-  STRIPE_SECRET_KEY_NAME = `/${process.env.SSM_STRIPE_SECRET_KEY}`,
-  STRIPE_ENDPOINT_SECRET_NAME = `/${process.env.SSM_STRIPE_ENDPOINT_SECRET}`,
-  IS_CORS = true;
+import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
+import { DynamoDBClient, PutItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
+import processRequest from './src/process-request.js';
+import processResponse from './src/process-response.js';
 
-let data = await ssm.getParameter({ Name: STRIPE_SECRET_KEY_NAME, WithDecryption: true }).promise();
-console.log(data);
-let stripeSecretKeyValue = data.Parameter.Value;
+const STRIPE_SECRET_KEY_NAME = `/${process.env.SSM_STRIPE_SECRET_KEY}`;
+const STRIPE_ENDPOINT_SECRET_NAME = `/${process.env.SSM_STRIPE_ENDPOINT_SECRET}`;
+const IS_CORS = true;
 
-data = await ssm.getParameter({ Name: STRIPE_ENDPOINT_SECRET_NAME, WithDecryption: true }).promise();
-console.log(data);
-let stripeEndpointSecret = data.Parameter.Value;
+// Getting secrets from SSM
+const ssm = new SSMClient();
 
-let stripe = require('stripe')(stripeSecretKeyValue);
+// Get Strip secretkey
+let command = new GetParameterCommand({ Name: STRIPE_SECRET_KEY_NAME, WithDecryption: true });
+let data = await ssm.send(command);
+const stripeSecretKeyValue = data.Parameter.Value;
 
-exports.handler = (event) => {
+// Get webhook endpoint secret
+command = new GetParameterCommand({ Name: STRIPE_ENDPOINT_SECRET_NAME, WithDecryption: true });
+data = await ssm.send(command);
+const stripeEndpointSecret = data.Parameter.Value;
+
+// Import and load stripe with private key from SSM
+import Stripe from 'stripe';
+const stripe = new Stripe(stripeSecretKeyValue);
+
+export const handler = async (event) => {
   console.log(event);
 
-  if (!event.body) {
+  if (!event.body) 
     return Promise.resolve(processResponse(IS_CORS, 'Body invalid', 400));
-  }
 
-  if (!event.headers['Stripe-Signature']) {
+  if (!event.headers['Stripe-Signature']) 
     return Promise.resolve(processResponse(IS_CORS, 'No stripe signature', 400));
-  }
 
   // Verify the signature sent by Stripe
   let stripeEvent;
@@ -37,17 +43,11 @@ exports.handler = (event) => {
   }
 
   console.log(`StripeEvent type: ${stripeEvent.type}`);
-
-  // Process events
-  switch (stripeEvent.type) {
-    case 'payment_intent.succeeded':
-      return Promise.resolve(processResponse(IS_CORS, `OK`, 200));
-    case 'customer.updated':
-      return Promise.resolve(processResponse(IS_CORS, `OK`, 200));
-    case 'charge.succeeded':
-      return Promise.resolve(processResponse(IS_CORS, `OK`, 200));
-    default:
-      console.error(`Unsupported Stripe event: ${stripeEvent.type}`);
-      return Promise.resolve(processResponse(IS_CORS, `Unsupported event ${stripeEvent.type}`, 400));
+  try {
+    const response = processRequest(stripeEvent);
+    return Promise.resolve(processResponse(IS_CORS, response, 200));
+  } catch (err) {
+    console.error(err.message);
+    return Promise.resolve(processResponse(IS_CORS, err.message, 400));
   }
 };

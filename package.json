@@ -14,7 +14,7 @@
     "qd": "npm run prepack && npm run package && npm run deploy && npm run describe"
   },
   "keywords": [],
-  "author": "Aleksandar Simovic <alexander.simovic@gmail.com>",
+  "author": "Nicolas Menciere",
   "license": "MIT",
   "jest": {
     "roots": [
@@ -23,8 +23,9 @@
     ]
   },
   "dependencies": {
-    "aws-xray-sdk": "^2.3.4",
-    "stripe": "^7.3.0"
+    "@aws-sdk/client-dynamodb": "^3.521.0",
+    "@aws-sdk/client-ssm": "^3.521.0",
+    "stripe": "^14.18.0"
   },
   "devDependencies": {
     "@types/node": "^8.10.38",

@@ -61,6 +61,8 @@ Resources:
             TopicName: !GetAtt SNSTopic.TopicName
         - SSMParameterReadPolicy:
             ParameterName: !Ref SSMStripeSecretKey
+        - SSMParameterReadPolicy:
+            ParameterName: !Ref SSMStripeEndpointSecret
       Environment:
         Variables:
           IS_CORS: IsCorsDefined

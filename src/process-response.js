@@ -1,4 +1,4 @@
-module.exports = (isCors, body, requestedCode) => {
+export function processResponse(isCors, body, requestedCode) {
   const code = requestedCode || (body ? 200 : 204);
   const headers = isCors ? {
     'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token',
@@ -11,4 +11,6 @@ module.exports = (isCors, body, requestedCode) => {
     body: JSON.stringify(body) || '',
     headers: headers
   };
-};
+}
+
+export default processResponse;
