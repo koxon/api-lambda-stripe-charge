@@ -11,7 +11,8 @@ export async function processRequest(stripeEvent) {
     'customer.subscription.updated',
     'invoice.payment_failed',
     'invoice.paid',
-    'checkout.session.completed'
+    'checkout.session.completed',
+    'checkout.session.expired'
   ];
 
   if (!supportedEvents.includes(stripeEvent.type))
