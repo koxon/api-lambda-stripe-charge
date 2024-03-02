@@ -1,21 +1,26 @@
-const captureAWS = require('aws-xray-sdk').captureAWS;
-const AWS = captureAWS(require('aws-sdk')),
-  sns = new AWS.SNS(),
-  NO_DATA_REPLY = 'You must provide data to the your PubSub';
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 
-module.exports = {
-  publish: function publish(data, topic, pubSub = sns) {
-    if (!data) {
-      return Promise.reject(NO_DATA_REPLY);
-    }
-    return pubSub.publish({
-        Message: JSON.stringify(data),
-        TopicArn: topic
-    })
-    .promise()
-    .catch(err => {
-        console.log(err);
-        return err;
-    });
-  }
-};
+export async function publish(data, topic) {
+  const snsClient = new SNSClient();
+  const response = await snsClient.send(
+    new PublishCommand({
+      Message: JSON.stringify(data),
+      TopicArn: topic,
+    }),
+  );
+  console.log('PUB to SNS', response);
+  // {
+  //   '$metadata': {
+  //     httpStatusCode: 200,
+  //     requestId: 'e7f77526-e295-5325-9ee4-281a43ad1f05',
+  //     extendedRequestId: undefined,
+  //     cfId: undefined,
+  //     attempts: 1,
+  //     totalRetryDelay: 0
+  //   },
+  //   MessageId: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+  // }
+  return response;
+}
+
+export default publish;

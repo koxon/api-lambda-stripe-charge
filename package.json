@@ -1,8 +1,8 @@
 {
   "name": "api-lambda-stripe-charge",
   "version": "4.4.2",
-  "description": "",
-  "main": "stripe.js",
+  "description": "Processes incoming Stripe events as API GW -> Lambda",
+  "main": "lambda.js",
   "type": "module",
   "scripts": {
     "test": "jest --color",
@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.521.0",
+    "@aws-sdk/client-sns": "^3.521.0",
     "@aws-sdk/client-ssm": "^3.521.0",
     "stripe": "^14.18.0"
   },

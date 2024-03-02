@@ -1,33 +1,25 @@
-export function processRequest(stripeEvent) {
-   // Process events
-  switch (stripeEvent.type) {
-    case 'payment_intent.succeeded':
-      console.log(`OK payment_intent.succeeded`);
-      return 'OK';
-    case 'customer.updated':
-      console.log(`OK customer.updated`);
-      return 'OK';
-    case 'customer.created':
-      console.log(`OK customer.created`);
-      return 'OK';
-    case 'charge.succeeded':
-      console.log(`OK charge.succeeded`);
-      return 'OK';
-    case 'customer.subscription.created':
-      console.log(`OK customer.subscription.created`);
-      return 'OK';
-    case 'customer.subscription.updated':
-      console.log(`OK customer.subscription.updated`);
-      return 'OK';
-    case 'invoice.payment_failed':
-      console.log(`OK invoice.payment_failed`);
-      return 'OK';
-    case 'invoice.paid':
-      console.log(`OK invoice.paid`);
-      return 'OK';
-    default:
-      throw `⚠️  Unsupported Stripe event: ${stripeEvent.type}`;
-  }
+import publish from './pubsub-repository.js';
+
+export async function processRequest(stripeEvent) {
+
+  const supportedEvents = [
+    'payment_intent.succeeded',
+    'customer.created',
+    'customer.updated',
+    'charge.succeeded',
+    'customer.subscription.created',
+    'customer.subscription.updated',
+    'invoice.payment_failed',
+    'invoice.paid',
+    'checkout.session.completed'
+  ];
+
+  if (!supportedEvents.includes(stripeEvent.type))
+    throw `⚠️  Unsupported Stripe event: ${stripeEvent.type}`;
+
+  publish(stripeEvent, process.env.TOPIC_ARN);
+  
+  return 'OK';
 }
 
 export default processRequest;

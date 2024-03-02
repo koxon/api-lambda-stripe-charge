@@ -1,5 +1,4 @@
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
-import { DynamoDBClient, PutItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import processRequest from './src/process-request.js';
 import processResponse from './src/process-response.js';
 
@@ -43,11 +42,12 @@ export const handler = async (event) => {
   }
 
   console.log(`StripeEvent type: ${stripeEvent.type}`);
+
   try {
     const response = processRequest(stripeEvent);
     return Promise.resolve(processResponse(IS_CORS, response, 200));
   } catch (err) {
-    console.error(err.message);
+    console.error(err);
     return Promise.resolve(processResponse(IS_CORS, err.message, 400));
   }
 };

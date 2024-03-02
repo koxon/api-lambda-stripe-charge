@@ -1,3 +1,5 @@
+// To be fixed and used in the future
+
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const AWSXRay = require('aws-xray-sdk-core');

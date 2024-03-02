@@ -1,14 +1,13 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-
 Globals:
   Function:
     Runtime: nodejs20.x
     Timeout: 10
     Tracing: Active
+    MemorySize: 256
     Architectures:
       - arm64
-
 Parameters:
   CorsOrigin:
     Type: String
@@ -54,8 +53,9 @@ Resources:
       Description: Webhooks for Stripe callbacks on checkout
   ProcessStripeEvent:
     Type: AWS::Serverless::Function
+    Description: Lambda processing Stripe events coming from Stripe
     Properties:
-      Handler: stripe.handler
+      Handler: lambda.handler
       Policies:
         - SNSCrudPolicy:
             TopicName: !GetAtt SNSTopic.TopicName
