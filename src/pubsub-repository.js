@@ -1,7 +1,11 @@
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 
 export async function publish(data, topic) {
-  const snsClient = new SNSClient();
+  console.log('SNS Topic', topic);
+  console.log('Sending to SNS', JSON.stringify(data));
+
+  const snsClient = new SNSClient({});
+  console.log('Sending...');
   const response = await snsClient.send(
     new PublishCommand({
       Message: JSON.stringify(data),

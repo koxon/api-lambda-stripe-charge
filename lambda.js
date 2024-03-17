@@ -44,7 +44,7 @@ export const handler = async (event) => {
   console.log(`StripeEvent type: ${stripeEvent.type}`);
 
   try {
-    const response = processRequest(stripeEvent);
+    const response = await processRequest(stripeEvent);
     return Promise.resolve(processResponse(IS_CORS, response, 200));
   } catch (err) {
     console.error(err);
