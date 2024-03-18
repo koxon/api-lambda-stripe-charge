@@ -1,6 +1,7 @@
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
 import processRequest from './src/process-request.js';
 import processResponse from './src/process-response.js';
+import Stripe from 'stripe';
 
 const STRIPE_SECRET_KEY_NAME = `/${process.env.SSM_STRIPE_SECRET_KEY}`;
 const STRIPE_ENDPOINT_SECRET_NAME = `/${process.env.SSM_STRIPE_ENDPOINT_SECRET}`;
@@ -20,7 +21,6 @@ data = await ssm.send(command);
 const stripeEndpointSecret = data.Parameter.Value;
 
 // Import and load stripe with private key from SSM
-import Stripe from 'stripe';
 const stripe = new Stripe(stripeSecretKeyValue);
 
 export const handler = async (event) => {

@@ -16,7 +16,7 @@ export async function processRequest(stripeEvent) {
   ];
 
   if (!supportedEvents.includes(stripeEvent.type))
-    throw `⚠️  Unsupported Stripe event: ${stripeEvent.type}`;
+    throw new Error(`⚠️  Unsupported Stripe event: ${stripeEvent.type}`);
 
   console.log('Publish to SQS');
   await publish(stripeEvent, process.env.TOPIC_ARN);
